@@ -1,0 +1,6 @@
+site_name: TREC Change Detection Track
+site_url: https://trec-changedet.github.io
+remote_branch: gh-pages
+nav:
+  - Home: 'index.md'
+  - TREC 2025 guidelines: '2025.md'
