@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://trec-changedet.github.io/2026/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>TREC 2026 guidelines - TREC Change Detection Track</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">TREC Change Detection Track</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">TREC 2026 guidelines</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#change-detection-2026-guidelines" class="nav-link">Change Detection 2026 guidelines</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#data" class="nav-link">Data</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#topics" class="nav-link">Topics</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#output-format" class="nav-link">Output format</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#evaluation" class="nav-link">Evaluation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#timeline" class="nav-link">Timeline</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<style>
+  code {
+    white-space : pre-wrap !important;
+    word-break: break-word;
+  }
+</style>
+
+<h1 id="change-detection-2026-guidelines">Change Detection 2026 guidelines</h1>
+<p>This page describes the specific guidelines for the 2026 track. Please read this entire page fully... this is a new task and there are some novel features that may not be obvious.</p>
+<p>Bring questions to the <a href="https://nistgov.slack.com/">TREC Slack</a> <code>#trec-change-detection-2026</code> channel.</p>
+<h2 id="data">Data</h2>
+<p>We will use the English portion of the RAGTIME1 dataset, available from <a href="https://huggingface.co/datasets/trec-ragtime/ragtime1" title="RAGTIME1 at HF">HuggingFace Datasets</a>. RAGTIME1 has 1M documents, with 1000 documents on each day of the collection.</p>
+<p>A document in RAGTIME is a JSON object:</p>
+<pre><code class="language-json">{
+    &quot;id&quot;: &quot;0e4ae416-c558-4741-9e4a-4988869bcd74_2154817&quot;,
+    &quot;text&quot;: &quot;Means, Franco lead Orioles to 5-2 win over Tigers\n\nDETROIT (AP) — John Means struck out six in six strong innings, Maikel Franco homered and the Baltimore Orioles beat the Detroit Tigers 5-2 on Saturday night.\n\nMeans (5-3) gave up one run on four hits and recorded his first victory since May 5....&quot;,
+    &quot;url&quot;: &quot;https://www.timesunion.com/sports/article/Means-Franco-lead-Orioles-to-5-2-win-over-Tigers-16355042.php&quot;,
+    &quot;date&quot;: &quot;2021-08-01T02:08:10.000Z&quot;
+}
+</code></pre>
+<p>The collection is timestamp-ordered. Participants must process the collection in order, one day at a time, and may not permit their systems to access documents in the "future". We are exploring developing a lightweight evaluation harness to simplify processing the collection and producing correctly-formatted output.</p>
+<p>Participant systems must to output their decisions on that day's documents that day, before receiving documents from subsequent days. Likewise, systems are only producing output for the documents of that day and not any days prior to that. Everything happens in distinct one-day chunks.</p>
+<h2 id="topics">Topics</h2>
+<p>The topics will be in JSONL format:</p>
+<pre><code class="language-json">{
+    &quot;tid&quot;: &quot;a topic identifier&quot;,
+    &quot;label&quot;: &quot;a label for the topic, similar to a title&quot;,
+    &quot;narrative&quot;: &quot;a description of the information need in paragraph form. The narrative describes the topic succinctly, as one might tell it to someone conversationally. It is not intended to completely specify the information need.&quot;,
+    &quot;questions&quot;: [
+        {
+            &quot;qid&quot;: &quot;a question identifier&quot;,
+            &quot;question&quot;: &quot;the question&quot;,
+            &quot;rel_docs&quot;: [
+                &quot;document-id-1&quot;,
+                &quot;document-id-2&quot;,
+                ...
+            ]
+        },
+        { ... }
+    ]
+}
+</code></pre>
+<p>All assessor-created analytic questions are present in the topic description, so they are known to the system at the start of the task. Additionally, questions will have a small number of example documents. Systems may use those documents when they arrive in the document stream. They are not guaranteed to be the first relevant documents in the collection.</p>
+<h2 id="output-format">Output format</h2>
+<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. (JSONL below pretty-printed for clarity) In general, runs may contain other information as long as the required fields are present. This is to allow you to include metadata about different stages of your process in the run.</p>
+<pre><code class="language-json">{   &quot;runtag&quot;: &quot;nist_cd_1&quot;,
+    &quot;run-type&quot;: &quot;manual | automatic&quot;,
+    &quot;llms-used&quot;: [ &quot;llama47&quot;, &quot;gpt-pi&quot;, &quot;gemini-foo-preview&quot; ],
+    &quot;description&quot;: &quot;a free text description of yout run&quot;,
+    &quot;other metadata&quot;: &quot;as you like&quot;
+},
+{
+    &quot;topic&quot;: &quot;s topic identifier&quot;,
+    &quot;the run may contain&quot;: &quot;other metadata here as you like&quot;,
+    &quot;results&quot;: {
+        &quot;2021-08-01&quot;: [
+            {
+                &quot;qid&quot;: &quot;q_1&quot;,
+                &quot;question-rank&quot;: 0,
+                &quot;doc-ranking&quot;: [
+                    { &quot;docid&quot;: &quot;doc-id-1&quot;, &quot;score&quot;: 0.9876 },
+                    { &quot;docid&quot;: &quot;doc-id-2&quot;, &quot;score&quot;: 0.9870 },
+                    ...
+                ],
+                &quot;extra&quot;: { &quot;you can include&quot;: &quot;extra metadata about your question response, like a score, or other info useful to you.&quot; }
+            },
+            {
+                &quot;qid&quot;: &quot;nist_cd_1_q_1&quot;,
+                &quot;question-rank&quot;: 1,
+                &quot;question-text&quot;: &quot;This is a new analytic question proposed by my system&quot;,
+                &quot;doc-ranking&quot;: [ ... ]
+            },
+            ...
+        ],
+        &quot;2021-08-02&quot;: ...
+    }
+}
+</code></pre>
+<p>Note that the TREC submission system enforces limits on the runtag: it must be 20 characters or less and can only include letters, numbers, hyphens, periods (not as the first character), and underscores. It must also be unique.  Traditionally runtags start with your team name or an abbreviation thereof, for example "nist-cd1".</p>
+<p>The top level may include any other slots you like, as long as <code>topic</code> and <code>runtag</code> are there. You can use this to store additional metadata about  that topic in your run. If your system is agentic, for example, you might include a representation of the agent interaction here.</p>
+<p>The <code>results</code> block is an object with one entry per date in the collection. If a date in the collection is not present in the run, that is interpreted as indicating that all known questions are equally ranked at rank 0.</p>
+<p>Each date entry is a list with one entry per question. If a known question is missing from the list, it is assumed to be ranked last out of all questions and tied with all other missing questions. (This way, you only need to include questions that you think matter on that day.)</p>
+<p>The question identifier <code>qid</code> is either the qid of a question in the topic file, or an identifier that starts with your runtag if the question is newly proposed by your system. Proposed questions are considered to be part of the set of questions for that topic from that day forward. Proposed questions must include a <code>question-text</code> field on the first day they appear, containing the question.</p>
+<p>The <code>question-rank</code> is an integer greater than or equal to zero. Ties between questions will be broken arbitrarily.</p>
+<p>The <code>doc-ranking</code> is a list of at most 100 <code>docid</code>,<code>score</code> pairs. This is interpreted as a ranked list of documents that are relevant to that question. The score is a double-precision floating-point number. The documents must be from that day (the 10-digit prefix of the document datestamp must match the date of this <code>results</code> entry). Documents not in the ranking are assumed to be retrieved with a tied score at the end of the ranking. Tied scores will be broken arbitrarily. The ranking may be empty, but it must be present.</p>
+<p>Aside from <code>qid</code>, <code>question-text</code> (if applicable), <code>question-rank</code>, and <code>doc-ranking</code>, the block can contain other fields with metadata about your run.</p>
+<h2 id="evaluation">Evaluation</h2>
+<h2 id="timeline">Timeline</h2>
+<ul>
+<li>Topics release: TBD</li>
+<li>Runs due: TBD</li>
+<li>Scores released: TBD</li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
