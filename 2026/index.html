@@ -149,7 +149,7 @@
 </code></pre>
 <p>All assessor-created analytic questions are present in the topic description, so they are known to the system at the start of the task. Additionally, questions will have a small number of example documents. Systems may use those documents when they arrive in the document stream. They are not guaranteed to be the first relevant documents in the collection.</p>
 <h2 id="output-format">Output format</h2>
-<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. (JSONL below pretty-printed for clarity) In general, runs may contain other information as long as the required fields are present. This is to allow you to include metadata about different stages of your process in the run.</p>
+<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. (JSONL below pretty-printed for clarity) The run metadata block will have several required fields (TBD). Both the run metadata line and the following per-topic lines may contain extra information in an <code>extra</code> slot. This is to allow you to include metadata about your run or about topic processing in the output file itself.</p>
 <pre><code class="language-json">{   &quot;runtag&quot;: &quot;nist_cd_1&quot;,
     &quot;run-type&quot;: &quot;manual | automatic&quot;,
     &quot;llms-used&quot;: [ &quot;llama47&quot;, &quot;gpt-pi&quot;, &quot;gemini-foo-preview&quot; ],
@@ -184,13 +184,12 @@
 }
 </code></pre>
 <p>Note that the TREC submission system enforces limits on the runtag: it must be 20 characters or less and can only include letters, numbers, hyphens, periods (not as the first character), and underscores. It must also be unique.  Traditionally runtags start with your team name or an abbreviation thereof, for example "nist-cd1".</p>
-<p>The top level may include any other slots you like, as long as <code>topic</code> and <code>runtag</code> are there. You can use this to store additional metadata about  that topic in your run. If your system is agentic, for example, you might include a representation of the agent interaction here.</p>
-<p>The <code>results</code> block is an object with one entry per date in the collection. If a date in the collection is not present in the run, that is interpreted as indicating that all known questions are equally ranked at rank 0.</p>
+<p>The <code>extra</code> entries can contain anything you like. You can use these blocks to store additional metadata about your run or that specific topic. If your system is agentic, for example, you might include a representation of the agent interaction in the per-topic <code>extra</code> block.</p>
+<p>The <code>results</code> block within a topic is an object with one entry per date in the collection. If a date in the collection is not present in the run, that is interpreted as indicating that all known questions are equally ranked at rank 0.</p>
 <p>Each date entry is a list with one entry per question. If a known question is missing from the list, it is assumed to be ranked last out of all questions and tied with all other missing questions. (This way, you only need to include questions that you think matter on that day.)</p>
 <p>The question identifier <code>qid</code> is either the qid of a question in the topic file, or an identifier that starts with your runtag if the question is newly proposed by your system. Proposed questions are considered to be part of the set of questions for that topic from that day forward. Proposed questions must include a <code>question-text</code> field on the first day they appear, containing the question.</p>
 <p>The <code>question-rank</code> is an integer greater than or equal to zero. Ties between questions will be broken arbitrarily.</p>
 <p>The <code>doc-ranking</code> is a list of at most 100 <code>docid</code>,<code>score</code> pairs. This is interpreted as a ranked list of documents that are relevant to that question. The score is a double-precision floating-point number. The documents must be from that day (the 10-digit prefix of the document datestamp must match the date of this <code>results</code> entry). Documents not in the ranking are assumed to be retrieved with a tied score at the end of the ranking. Tied scores will be broken arbitrarily. The ranking may be empty, but it must be present.</p>
-<p>Aside from <code>qid</code>, <code>question-text</code> (if applicable), <code>question-rank</code>, and <code>doc-ranking</code>, the block can contain other fields with metadata about your run.</p>
 <h2 id="evaluation">Evaluation</h2>
 <h2 id="timeline">Timeline</h2>
 <ul>
