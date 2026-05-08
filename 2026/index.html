@@ -78,6 +78,10 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#change-detection-2026-guidelines" class="nav-link">Change Detection 2026 guidelines</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#task-description" class="nav-link">Task description</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-bs-level="2"><a href="#data" class="nav-link">Data</a>
               <ul class="nav flex-column">
               </ul>
@@ -115,6 +119,13 @@
 <h1 id="change-detection-2026-guidelines">Change Detection 2026 guidelines</h1>
 <p>This page describes the specific guidelines for the 2026 track. Please read this entire page fully... this is a new task and there are some novel features that may not be obvious.</p>
 <p>Bring questions to the <a href="https://nistgov.slack.com/">TREC Slack</a> <code>#trec-change-detection-2026</code> channel.</p>
+<h2 id="task-description">Task description</h2>
+<p>The document collection is a chronologically-ordered set of web news articles. The task proceeds day-by-day through the collection.</p>
+<p>A topic represents an information need that the user is tracking over time. In the context of that topic, the user has a set of questions that they use to organize the information coming in.</p>
+<p>On each day, your system will return a ranked list of questions that are relevant on that day. A question is relevant if there are relevant documents that inform the question on that day. Your system should <strong>only</strong> return relevant questions, and may decide to not rank any questions for that day.</p>
+<p>For every ranked question, your system will return a ranked list of at most 100 documents predicted to be relevant to the question. "Relevant" here means that the document contains information that is at least responsive to the question and is hopefully useful in answering the question. If there are no relevant documents for the question on that day, the question should be left off the ranking.</p>
+<p>Your system can additionally propose <strong>new</strong> questions, and put them into their question ranking starting on the day they are proposed.</p>
+<p>On most days, there may be nothing of relevance to the topic. Systems should <strong>only</strong> return questions predicted to be relevant, and must decide where to cut off their ranking. (Missing questions will be assumed to have zero-length document rankings for that day.) <strong>In fact, it's pretty safe to assume there is very little if any actionable traffic on any given day.</strong></p>
 <h2 id="data">Data</h2>
 <p>We will use the English portion of the RAGTIME1 dataset, available from <a href="https://huggingface.co/datasets/trec-ragtime/ragtime1" title="RAGTIME1 at HF">HuggingFace Datasets</a>. RAGTIME1 has 1M documents, with 1000 documents on each day of the collection.</p>
 <p>A document in RAGTIME is a JSON object:</p>
@@ -126,10 +137,10 @@
 }
 </code></pre>
 <p>The collection is timestamp-ordered. Participants must process the collection in order, one day at a time, and may not permit their systems to access documents in the "future".</p>
-<p>Participant systems must to output their decisions on that day's documents that day, before receiving documents from subsequent days. Likewise, systems are only producing output for the documents of that day and not any days prior to that. Everything happens in distinct one-day chunks.</p>
-<p>We have <a href="https://github.com/trec-changedet/cdet-api">developed a toolkit</a> that you can use to build your system so that the track protocol is followed and your output file is correctly formatted. While the toolkit is implemented in Python, it uses an OpenAPI-based REST server and you can communicate with it however you like.</p>
+<p>Participant systems must to output their decisions on that day's documents that day, before receiving documents from subsequent days. Likewise, systems are only producing output for the documents of that day and not any days prior to that. Systems should process all the topics for day N before proceeding to day N+1. Everything happens in distinct one-day chunks.</p>
+<p>We have <a href="https://github.com/trec-changedet/cdet-api">developed a toolkit</a> that you can use to build your system so that the track protocol is followed and your output file is correctly formatted. While the toolkit is implemented in Python, it uses an OpenAPI-based REST server and you can communicate with it however you like. The toolkit includes a simplistic model system that demonstrates its use, a few development topics, and (not yet) the scoring script.</p>
 <h2 id="topics">Topics</h2>
-<p>The topics will be in JSONL format:</p>
+<p>The topics are in JSONL format: (JSONL here and below pretty-printed for clarity)</p>
 <pre><code class="language-json">{
     &quot;tid&quot;: &quot;a topic identifier&quot;,
     &quot;label&quot;: &quot;a label for the topic, similar to a title&quot;,
@@ -148,9 +159,10 @@
     ]
 }
 </code></pre>
-<p>All assessor-created analytic questions are present in the topic description, so they are known to the system at the start of the task. Additionally, questions will have a small number of example documents. Systems may use those documents when they arrive in the document stream. They are not guaranteed to be the first relevant documents in the collection.</p>
+<p>All assessor-created analytic questions are present in the topic description, so they are known to the system at the start of the task. Additionally, questions will have a small number of example documents. Systems may use those documents when they arrive in the document stream, but not before. They are not guaranteed to be the first relevant documents in the collection.</p>
+<p>A small number of development topics, with all relevant documents identified during topic development will be released with the <a href="https://github.com/trec-changedet/cdet-api">API tool</a>.</p>
 <h2 id="output-format">Output format</h2>
-<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. (JSONL below pretty-printed for clarity) The run metadata block will have several required fields (TBD). Both the run metadata line and the following per-topic lines may contain extra information in an <code>extra</code> slot. This is to allow you to include metadata about your run or about topic processing in the output file itself.</p>
+<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. The run metadata block will have several required fields (TBD). Both the run metadata line and the following per-topic lines may contain extra information in an <code>extra</code> slot. This is to allow you to include your own metadata about your run or about topic processing in the output file itself.</p>
 <pre><code class="language-json">{   &quot;runtag&quot;: &quot;nist_cd_1&quot;,
     &quot;models&quot;: [ &quot;llama47&quot;, &quot;gpt-pi&quot;, &quot;gemini-foo-preview&quot; ],
     &quot;description&quot;: &quot;a free text description of yout run&quot;,
@@ -187,17 +199,35 @@
 <p>Note that the TREC submission system enforces limits on the runtag: it must be 20 characters or less and can only include letters, numbers, hyphens, periods (not as the first character), and underscores. It must also be unique.  Traditionally runtags start with your team name or an abbreviation thereof, for example "nist-cd1".</p>
 <p>The <code>extra</code> entries can contain anything you like. You can use these blocks to store additional metadata about your run or that specific topic. If your system is agentic, for example, you might include a representation of the agent interaction in the per-topic <code>extra</code> block.</p>
 <p>The <code>results</code> block within a topic is an object with one entry per date in the collection. If a date in the collection is not present in the run, that is interpreted as indicating that all known questions are equally ranked at rank 0.</p>
-<p>Each date entry is a list with one entry per question. If a known question is missing from the list, it is assumed to be ranked last out of all questions and tied with all other missing questions. (This way, you only need to include questions that you think matter on that day.)</p>
+<p>Each date entry is a list with one entry per question. The list should <strong>only</strong> include questions your system decides have relevant information to return. A question that is missing that day is assumed to have had an empty ranked list of documents for that day.</p>
 <p>The question identifier <code>qid</code> is either the qid of a question in the topic file, or an identifier that starts with your runtag if the question is newly proposed by your system. Proposed questions are considered to be part of the set of questions for that topic from that day forward.</p>
 <p>The <code>question-rank</code> is an integer greater than or equal to zero. Ties between questions will be broken arbitrarily.</p>
-<p>The <code>doc-ranking</code> is a list of at most 100 <code>docid</code>,<code>score</code> pairs. This is interpreted as a ranked list of documents that are relevant to that question. The score is a double-precision floating-point number. The documents must be from that day (the 10-digit prefix of the document datestamp must match the date of this <code>results</code> entry). Documents not in the ranking are assumed to be retrieved with a tied score at the end of the ranking. Tied scores will be broken arbitrarily. The ranking may be empty, but it must be present.</p>
+<p>The <code>doc-ranking</code> is a list of 1 to 100 <code>docid</code>,<code>score</code> pairs. This is interpreted as a ranked list of documents that are relevant to that question. The score is a double-precision floating-point number. The documents must be from that day (the 10-digit prefix of the document datestamp must match the date of this <code>results</code> entry). Systems should <strong>only</strong> return documents with relevant information, and should truncate their ranking at the point where they believe there are no more relevant documents.</p>
 <h2 id="evaluation">Evaluation</h2>
-<p>TBA</p>
+<p>Performance will be based on the daily ranking of questions, and the rankings of documents for each question.</p>
+<p>The metrics will be the variants of NDCG, AP, RBP, and RR described in "Quit While Ahead: Evaluating Truncated Rankings", by Fei Liu, Alistair Moffat, Timothy Baldwin, and Xiuzhen Zhang (SIGIR 2016, <a href="http://dx.doi.org/10.1145/2911451.2914737">Paper link</a>). Notionally, these metrics append a sentinel document to the end of your ranking with a gain level related to the maximum "gain recall" of the ranking. The result is that when there are no relevant items, you get credit for returning nothing, and returning irrelevant items past the last relevant retrieved decreases the score.</p>
+<p>Questions will be judged relevant on a given day as:</p>
+<ul>
+<li>Not relevant that day (gain = 0)</li>
+<li>Has some relevant information that day, but nothing critical (gain = 1)</li>
+<li>Has some important information (gain = 5)</li>
+<li>This question is has information of critical importance today (gain = 10)</li>
+</ul>
+<p>Documents will be judged on a similar scale:</p>
+<ul>
+<li>Not relevant that day (gain = 0)</li>
+<li>Is "on topic" for the question, but not important (gain = 1)</li>
+<li>Is moderately important; needs to be noted but is not critical (gain = 5)</li>
+<li>Contains a vital update about this question today (gain = 10)</li>
+</ul>
+<p>All metrics will use gain values, including AP, as described in <a href="http://dx.doi.org/10.1145/2911451.2914737">the paper</a>.</p>
+<p>Average performance will be reported per question, averaged over all days in the collection. Question scores will be averaged to compute a single score for a topic, and topic scores will be averaged to compute a single score for the run, but it is expected that the per-question scores will be most useful for analyzing your system.</p>
+<p>The scoring script has not yet been released.</p>
 <h2 id="timeline">Timeline</h2>
 <ul>
-<li>Topics release: TBD</li>
-<li>Runs due: TBD</li>
-<li>Scores released: TBD</li>
+<li>Topics release: May 15</li>
+<li>Runs due: July 26, AoE, at <a href="https://ir.nist.gov/evalbase">Evalbase</a></li>
+<li>Scores released: Oct 15</li>
 </ul></div>
             </div>
         </div>
