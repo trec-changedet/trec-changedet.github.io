@@ -94,6 +94,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-bs-level="2"><a href="#run-metadata" class="nav-link">Run metadata</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-bs-level="2"><a href="#evaluation" class="nav-link">Evaluation</a>
               <ul class="nav flex-column">
               </ul>
@@ -159,13 +163,18 @@
     ]
 }
 </code></pre>
-<p>All assessor-created analytic questions are present in the topic description, so they are known to the system at the start of the task. Additionally, questions will have a small number of example documents. Systems may use those documents when they arrive in the document stream, but not before. They are not guaranteed to be the first relevant documents in the collection.</p>
-<p>A small number of development topics, with all relevant documents identified during topic development will be released with the <a href="https://github.com/trec-changedet/cdet-api">API tool</a>.</p>
+<p>All assessor-created analytic questions are present in the topic description, so they are known to the system at the start of the task. Additionally, questions will have a small number of example documents. Systems may use those documents when they arrive in the document stream, but not before. They are the earliest relevant documents identified during topic development, but they are not guaranteed to be the first relevant documents in the collection.</p>
+<p>There are two topics for you to use as development data:</p>
+<ul>
+<li><a href="../data/dev-topics.jsonl">Dev topics, as test data</a>: These include two documents per question, just like the test data.</li>
+<li><a href="../data/dev-topics-all-docs.jsonl">Dev topics, with all documents</a>: These include all documents found during topic development. You can use these to see if your system is finding relevant documents.</li>
+</ul>
 <h2 id="output-format">Output format</h2>
 <p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. The run metadata block will have several required fields (TBD). Both the run metadata line and the following per-topic lines may contain extra information in an <code>extra</code> slot. This is to allow you to include your own metadata about your run or about topic processing in the output file itself.</p>
 <pre><code class="language-json">{   &quot;runtag&quot;: &quot;nist_cd_1&quot;,
     &quot;models&quot;: [ &quot;llama47&quot;, &quot;gpt-pi&quot;, &quot;gemini-foo-preview&quot; ],
     &quot;description&quot;: &quot;a free text description of yout run&quot;,
+    &quot;extern&quot;: &quot;any external data used for this run&quot;,
     &quot;extra&quot;: { &quot;other metadata&quot;: &quot;as you like&quot; }
 },
 {
@@ -203,8 +212,88 @@
 <p>The question identifier <code>qid</code> is either the qid of a question in the topic file, or an identifier that starts with your runtag if the question is newly proposed by your system. Proposed questions are considered to be part of the set of questions for that topic from that day forward.</p>
 <p>The <code>question-rank</code> is an integer greater than or equal to zero. Ties between questions will be broken arbitrarily.</p>
 <p>The <code>doc-ranking</code> is a list of 1 to 100 <code>docid</code>,<code>score</code> pairs. This is interpreted as a ranked list of documents that are relevant to that question. The score is a double-precision floating-point number. The documents must be from that day (the 10-digit prefix of the document datestamp must match the date of this <code>results</code> entry). Systems should <strong>only</strong> return documents with relevant information, and should truncate their ranking at the point where they believe there are no more relevant documents.</p>
+<h2 id="run-metadata">Run metadata</h2>
+<p>The first line in the run output is a block of metadata. The content in this block serves the role of the traditional "Run Submission Form" questionnaire. An example of the block appears above in the run output sample. The block is required and must follow this JSON Schema:</p>
+<pre><code class="language-json">&quot;RunMetadata&quot;: {
+  &quot;properties&quot;: {
+    &quot;runtag&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;maxLength&quot;: 20,
+      &quot;minLength&quot;: 1,
+      &quot;pattern&quot;: &quot;^[a-zA-Z0-9_-][a-zA-Z0-9_.-]{1,20}$&quot;,
+      &quot;title&quot;: &quot;Runtag&quot;,
+      &quot;description&quot;: &quot;Run identifier. Must be 20 characters or less, contain only numbers, letters, periods, hyphens, and underscores, and not begin with a period.&quot;,
+      &quot;examples&quot;: [
+        &quot;my_run&quot;,
+        &quot;NISTrun1&quot;
+      ]
+    },
+    &quot;description&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;title&quot;: &quot;Description&quot;,
+      &quot;description&quot;: &quot;Provide a description of your run that briefly explains your approach to the task.&quot;,
+      &quot;examples&quot;: [
+        &quot;Provide a description of your run that briefly explains your approach to the task.&quot;
+      ]
+    },
+    &quot;models&quot;: {
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;string&quot;
+      },
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;title&quot;: &quot;Models&quot;,
+      &quot;description&quot;: &quot;Give names or URLs of LLMs used in this run. The names should be descriptive enough to allow others to reproduce your run.&quot;,
+      &quot;examples&quot;: [
+        [
+          &quot;gemini-3.1-pro-preview&quot;,
+          &quot;meta/llama-4-maverick-17b-128e-instruct-maas&quot;,
+          &quot;claude-sonnet-4-6&quot;
+        ]
+      ]
+    },
+    &quot;extern&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;title&quot;: &quot;External information&quot;,
+      &quot;description&quot;: &quot;Provide a description of any data used outside the topics and the RAGTIME1 English dataset. For example, if you used another dataset to establish corpus statistics, note that here.&quot;,
+      &quot;examples&quot;: [
+        &quot;Provide a description of any data used outside the topics and the RAGTIME1 English dataset. For example, if you used another dataset to establish corpus statistics, note that here.&quot;
+      ]
+    },
+    &quot;extra&quot;: {
+      &quot;anyOf&quot;: [
+        {
+          &quot;additionalProperties&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;type&quot;: &quot;object&quot;
+        },
+        {
+          &quot;type&quot;: &quot;null&quot;
+        }
+      ],
+      &quot;title&quot;: &quot;Extra&quot;,
+      &quot;description&quot;: &quot;You can add any private metadata about your run here.&quot;,
+      &quot;examples&quot;: [
+        {
+          &quot;affiliation&quot;: &quot;Miskatonic University&quot;,
+          &quot;special_thanks_to&quot;: &quot;the grad students&quot;
+        }
+      ]
+    }
+  },
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;required&quot;: [
+    &quot;runtag&quot;,
+    &quot;description&quot;,
+    &quot;models&quot;,
+    &quot;extern&quot;
+  ],
+  &quot;title&quot;: &quot;RunMetadata&quot;
+},
+</code></pre>
+<p>This schema and the Pydantic type definition that generated it can be found in the <a href="https://github.com/trec-changedet/cdet-api">API tool</a>.</p>
 <h2 id="evaluation">Evaluation</h2>
-<p>Performance will be based on the daily ranking of questions, and the rankings of documents for each question.</p>
+<p>Performance will be based on the daily ranking of questions, and the rankings of documents for each question. Systems should only rank relevant questions and relevant documents, and will be penalized for long, irrelevant rankings. If there is nothing to report, systems should report nothing.</p>
 <p>The metrics will be the variants of NDCG, AP, RBP, and RR described in "Quit While Ahead: Evaluating Truncated Rankings", by Fei Liu, Alistair Moffat, Timothy Baldwin, and Xiuzhen Zhang (SIGIR 2016, <a href="http://dx.doi.org/10.1145/2911451.2914737">Paper link</a>). Notionally, these metrics append a sentinel document to the end of your ranking with a gain level related to the maximum "gain recall" of the ranking. The result is that when there are no relevant items, you get credit for returning nothing, and returning irrelevant items past the last relevant retrieved decreases the score.</p>
 <p>Questions will be judged relevant on a given day as:</p>
 <ul>
