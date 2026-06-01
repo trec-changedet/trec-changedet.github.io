@@ -170,10 +170,11 @@
 <li><a href="../data/dev-topics-all-docs.jsonl">Dev topics, with all documents</a>: These include all documents found during topic development. You can use these to see if your system is finding relevant documents.</li>
 </ul>
 <h2 id="output-format">Output format</h2>
-<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. The run metadata block will have several required fields (TBD). Both the run metadata line and the following per-topic lines may contain extra information in an <code>extra</code> slot. This is to allow you to include your own metadata about your run or about topic processing in the output file itself.</p>
+<p>The format for a run is a JSONL file, starting with a run metadata line and then with one line per topic. The run metadata block has several required fields (see below). Both the run metadata line and the following per-topic lines may contain extra information in an <code>extra</code> slot. This is to allow you to include your own metadata about your run or about topic processing in the output file itself.</p>
 <pre><code class="language-json">{   &quot;runtag&quot;: &quot;nist_cd_1&quot;,
     &quot;models&quot;: [ &quot;llama47&quot;, &quot;gpt-pi&quot;, &quot;gemini-foo-preview&quot; ],
     &quot;description&quot;: &quot;a free text description of yout run&quot;,
+    &quot;run_type&quot;: &quot;automatic&quot;,
     &quot;extern&quot;: &quot;any external data used for this run&quot;,
     &quot;extra&quot;: { &quot;other metadata&quot;: &quot;as you like&quot; }
 },
@@ -234,6 +235,19 @@
       &quot;description&quot;: &quot;Provide a description of your run that briefly explains your approach to the task.&quot;,
       &quot;examples&quot;: [
         &quot;Provide a description of your run that briefly explains your approach to the task.&quot;
+      ]
+    },
+    &quot;run_type&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;enum&quot;: [
+        &quot;manual&quot;,
+        &quot;automatic&quot;
+      ],
+      &quot;title&quot;: &quot;Run type&quot;,
+      &quot;description&quot;: &quot;Is this run manual or automatic? An automatic run is one with no human intervention: essentially a program that takes the test topics as input and produces a run file as output. A manual run is one that has any level of manual intervention, from reviewing the test topic file on up to doing the task completely by hand.&quot;,
+      &quot;examples&quot;: [
+        &quot;manual&quot;,
+        &quot;automatic&quot;
       ]
     },
     &quot;models&quot;: {
