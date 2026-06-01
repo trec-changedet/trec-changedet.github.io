@@ -2,6 +2,10 @@
 
 Change Detection is a new track for TREC 2026.  The goal of the track is to consider information over a day-to-day review process and think about how systems could surface content by indicating how it is relevant to aspects of the topic aside from "relevance".
 
+This page is an overview of the task. [See the TREC 2026 task guidelines](2026.md) for details on how to participate in the task.
+
+To participate in the track, you [need to register for TREC 2026](https://trec.nist.gov/cfp.html). The test data for the track is only available to TREC participants until the end of the TREC cycle.
+
 ## Chronology
 
 The model of the track is a user with a daily inbox to work through. The vast majority of documents in the daily inbox are irrelevant to that user, but a few might be. Systems need to be able to surface those documents.
